@@ -1,17 +1,22 @@
 const express = require('express');
 const router = express.Router();
-const {pool} = require('../database/dbinfo')
+const {connection} = require('../database/dbinfo')
 
-router.get('/', async(req, res)=> {
-    try {
-        await pool.connect();
-        const result = await pool.request().query('select * from zztest1');
-        const test = result.recordset;
-        res.json(test);
-        console.log(test);
-    }catch (e) {
-        res.json(e)
-    }
-})
+    // http://127.0.0.1:3000/api/test/
+    router.get('/:id', (req, res)=> {
+        req.params.id
+        var query;
+        query = "insert into test1 values ('"+req.params.id+"')";
+        connection.query(query, (error, results, fields) => {
+            console.log(req.params.id);
+        });
+
+        query = 'select * from test1';
+        connection.query(query, (error, results, fields) => {
+            res.json(results);
+        });
+    })
+
+
 
 module.exports = router;
