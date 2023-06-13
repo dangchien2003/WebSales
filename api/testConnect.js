@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {connection} = require('../database/dbinfo')
 
-    // http://127.0.0.1:3000/api/test/
+    // http://127.0.0.1:3000/test/
     router.get('/:id', (req, res)=> {
         req.params.id
         var query;
@@ -13,6 +13,7 @@ const {connection} = require('../database/dbinfo')
 
         query = 'select * from test1';
         connection.query(query, (error, results, fields) => {
+            console.log(results);
             res.json(results);
         });
     })
