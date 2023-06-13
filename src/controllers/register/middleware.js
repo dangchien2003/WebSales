@@ -1,5 +1,4 @@
-
-const {connection} = require('../../database/dbinfo')   
+const {connection} = require('../../../database/dbinfo')   
 
 function checkExsit(req, res, next)
 {

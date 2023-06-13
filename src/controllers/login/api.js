@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const {checkRequest, checkExist} = require('../middleware/login/login');
+const {checkRequest, checkExist} = require('./middleware');
 
 //get http://127.0.0.1:3000/login/
 router.get('/', (req, res)=> {

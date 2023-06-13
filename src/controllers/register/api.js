@@ -1,5 +1,5 @@
 const express = require('express');
-const {checkExsit, checkValidate, add} = require('../middleware/register/register');
+const {checkExsit, checkValidate, add} = require('./middleware');
 const router = express.Router();
 
 
