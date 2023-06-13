@@ -1,4 +1,4 @@
-const {connection} = require('../../../database/dbinfo')   
+const {connection} = require('../../../config/config_mysql')   
 
 function checkRequest(req, res, next) {
     (req.body.user && req.body.password) ? next() : res.json(false)

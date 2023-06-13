@@ -1,4 +1,4 @@
-const {connection} = require('../../../database/dbinfo')   
+const {connection} = require('../../../config/config_mysql')   
 
 function checkExsit(req, res, next)
 {
