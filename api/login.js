@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {connection} = require('../database/dbinfo')
+
 const {checkRequest, checkExist} = require('../middleware/login/login');
 
 //get http://127.0.0.1:3000/login/
