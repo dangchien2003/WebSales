@@ -3,7 +3,8 @@ const router = express.Router();
 
 const {
     checkRequest,
-    checkExist
+    checkExist,
+    checkBlocked
 } = require('./middleware');
 
 //get http://127.0.0.1:3000/login/
@@ -12,7 +13,7 @@ router.get('/', (req, res) => {
 })
 
 //post http://127.0.0.1:3000/login/
-router.post('/', checkRequest, checkExist)
+router.post('/', checkRequest, checkExist, checkBlocked)
 
 
 
