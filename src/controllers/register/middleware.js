@@ -1,13 +1,19 @@
-const {connection} = require('../../../config/config_mysql')   
+const {
+    connection
+} = require('../../../config/config_mysql')
 
-function checkExsit(req, res, next)
-{
+function checkExsit(req, res, next) {
     var user = req.body.user;
     let query = `select count(*) as count from accounts where user = '${user}'`;
 
-    connection.query(query, (error, result)=> {
-        if(error) res.status(500).json(error);
-        if (result[0].count != 0) res.json({result: {exit: true, condition: true}})
+    connection.query(query, (error, result) => {
+        if (error) res.status(500).json(error);
+        if (result[0].count != 0) res.json({
+            result: {
+                exit: true,
+                condition: true
+            }
+        })
         else next();
     })
 }
@@ -23,8 +29,13 @@ function checkValidate(req, res, next) {
         password: /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
         rank: /^[1-9]{1,}$/
     };
-    if(regexs.user.test(data.user) && regexs.password.test(data.password) && regexs.rank.test(data.rank)) next();
-    else res.json({result: {exit: false, condition: false}});
+    if (regexs.user.test(data.user) && regexs.password.test(data.password) && regexs.rank.test(data.rank)) next();
+    else res.json({
+        result: {
+            exit: false,
+            condition: false
+        }
+    });
 }
 
 function add(req, res, next) {
@@ -38,7 +49,9 @@ function add(req, res, next) {
     let currentTime = new Date();
 
     // Định dạng thời gian theo múi giờ của Việt Nam
-    let options = { timeZone: 'Asia/Ho_Chi_Minh' };
+    let options = {
+        timeZone: 'Asia/Ho_Chi_Minh'
+    };
 
     let timeNow = `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDay()} ${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`;
 
@@ -46,9 +59,15 @@ function add(req, res, next) {
     connection.query(query, (error, result) => {
         if (error) {
             console.log(error.message);
-            res.json({error: true, success: false})
-        }else {
-            res.json({error: false, success: true})
+            res.json({
+                error: true,
+                success: false
+            })
+        } else {
+            res.json({
+                error: false,
+                success: true
+            })
         }
     })
 }
@@ -56,5 +75,7 @@ function add(req, res, next) {
 
 
 module.exports = {
-    checkExsit, checkValidate, add
+    checkExsit,
+    checkValidate,
+    add
 }
