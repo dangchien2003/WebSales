@@ -61,11 +61,11 @@ function checkBlocked(req, res, next) {
     //console.log('checkBlocked');
 
     const user = req.body.user;
-    const blocked = 'true';
-    const query = `select BINARY blocked as blocked from websales.accounts where User = '${user}'`;
+    const query = `SELECT COUNT(*) AS count FROM websales.accounts WHERE User = '${user}' AND BLOCKED = 1`;
+
+
 
     connection.query(query, (error, results) => {
-
         if (error) {
             console.log(error.message);
 
@@ -73,12 +73,14 @@ function checkBlocked(req, res, next) {
             req.resultsSv.server.message = "error check blocked account";
         } else {
             req.resultsSv.server.error = false;
-            if (Boolean(results[0].blocked) === true) {
+            if (results[0].count != 0) {
                 console.log('block');
 
                 req.resultsSv.account.blocked = true;
                 res.json(req.resultsSv)
             } else {
+                console.log('NOT BLOCKED');
+
                 req.resultsSv.account.blocked = false;
                 res.json(req.resultsSv)
             }
