@@ -96,12 +96,12 @@ function checkBlocked(req, res, next) {
         .then((results) => {
             req.resultsSv.server.error = false;
             if (results[0].count != 0) {
-                console.log('block');
+                //console.log('block');
 
                 req.resultsSv.account.blocked = true;
                 res.json(req.resultsSv)
             } else {
-                console.log('NOT BLOCKED');
+                //console.log('NOT BLOCKED');
 
                 req.resultsSv.account.blocked = false;
                 res.json(req.resultsSv)
