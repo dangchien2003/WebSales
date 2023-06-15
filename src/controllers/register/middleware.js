@@ -7,11 +7,11 @@ function checkExsit(req, res, next) {
     var user = req.body.user;
     let query = `select count(*) as count from accounts where user = '${user}'`;
 
-    const promissCheckExsit = new Promise((resolve, reject) =>{
+    const promissCheckExsit = new Promise((resolve, reject) => {
         connection.query(query, (error, result) => {
-            if(error) {
+            if (error) {
                 reject(error);
-            }else {
+            } else {
                 resolve(result);
             }
         })
@@ -26,10 +26,10 @@ function checkExsit(req, res, next) {
 
     promissCheckExsit
         .then((results) => {
-            if (results[0].count != 0){
+            if (results[0].count != 0) {
                 result.exit = true;
                 res.json(result)
-            }else {
+            } else {
                 next();
             }
         })
@@ -62,14 +62,14 @@ function checkValidate(req, res, next) {
         condition_name: '',
     };
 
-    for(let i = 0; i < regexs.length; i++) {
-        if(!regexs[i].regex.test(regexs[i].data)){
+    for (let i = 0; i < regexs.length; i++) {
+        if (!regexs[i].regex.test(regexs[i].data)) {
             result.condition = false;
             result.condition_name = regexs[i].data;
             res.json(result);
             break;
         }
-        if(i === regexs.length-1) {
+        if (i === regexs.length - 1) {
             next();
         }
     }
@@ -96,9 +96,9 @@ function add(req, res, next) {
 
     const promissAddAccount = new Promise((resolve, reject) => {
         connection.query(query, (error, result) => {
-            if(error) {
+            if (error) {
                 reject(error);
-            }else {
+            } else {
                 resolve(result);
             }
         });

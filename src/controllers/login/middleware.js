@@ -2,133 +2,61 @@ const {
     connection
 } = require('../../../config/config_mysql')
 
-const initialResultsSv = {
-    request: {
-        fullInfo: "",
-    },
-    server: {
-        error: "",
-        message: "",
-    },
-    account: {
-        blocked: "",
-        exist: "",
-        firstName: "",
-        lastName: "",
-        id: "",
-        rank: "",
-    },
-
-}
-
-// function openConnection() {
-//     console.log('openConnection');
-//     connection.connect(() => {});
-// }
-
-// function disConnection() {
-//     console.log('disConnection');
-//     connection.end();
-// }
-
-function checkRequest(req, res, next) {
-    //console.log('checkRequest');
-    req.resultsSv = {
-        ...req.resultsSv, ...initialResultsSv
-    };
+function checkRequest(req) {
     if (req.body.user && req.body.password) {
-        req.resultsSv.request.fullInfo = true;
-        next();
+        return {
+            fullInfo: true
+        };
     } else {
-        req.resultsSv.request.fullInfo = false;
-        res.json(req.resultsSv);
+        return {
+            fullInfo: false
+        };
     }
 }
 
-async function checkExist(req, res, next) {
-    //console.log('checkExist');
-    req.resultsSv = { ...req.resultsSv, ...initialResultsSv };
-    const query = `select count(*) as count, rank, user AS id from websales.accounts where User = '${req.body.user}' and Password = '${req.body.password}'`;
 
-    const promiseCheckExist = new Promise((resolve, reject) => {
-        connection.query(query, (err, results) => {
-
-            if (err) {
-                reject(err);
-            } else {
-                resolve(results);
-            }
-        });
-    });
-
-    promiseCheckExist
-        .then((results) => {
-            req.resultsSv.server.error = false;
-            const count = results[0].count;
-            if (count !== 0) {
-                req.resultsSv.account.exist = true;
-                req.resultsSv.account.id = results[0].id;
-                req.resultsSv.account.rank = results[0].rank;
-                next();
-            } else {
-                req.resultsSv.account.exist = false;
-                res.json(req.resultsSv);
-            }
-        })
-        .catch((err) => {
-            req.resultsSv.server.error = true;
-            req.resultsSv.server.message = "error check exist account";
-            console.log(err.message);
-            res.status(500).json(req.resultsSv);
-        })
+function covertApiAccounts(sql, api) {
+    api.account = {
+        exist: !!sql[0].count,
+        id: sql[0].user,
+        rank: sql[0].rank,
+        blocked: !!sql[0].blocked,
+    }
 }
+async function responseApi(req, res, next) {
+    console.log("🚀 ~ file: middleware.js:27 ~ responseApi ~ req:", req.body)
+    
+    const api = {};
+    try {
+        // check full info
+        api.request = checkRequest(req);
+        if (!checkRequest(req).fullInfo) {
+            res.json(api);
+            return;
+        }
 
+        const query = `select count(user) as count, rank, blocked, user from websales.accounts where user = '${req.body.user}' and Password = '${req.body.password}'`;
 
-function checkBlocked(req, res, next) {
-    //console.log('checkBlocked');
-    req.resultsSv = { ...req.resultsSv, ...initialResultsSv };
-    const user = req.body.user;
-    const query = `SELECT COUNT(*) AS count FROM websales.accounts WHERE User = '${user}' AND BLOCKED = 1`;
-
-
-    const promiseCheckBlocked = new Promise((resolve, reject) => {
-        connection.query(query, (err, result) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(result);
-            }
+        console.log("🚀 ~ file: middleware.js:40 ~ responseApi ~ query:", query)
+        // promise => result query
+        const sql = await new Promise((resolve) => {
+            connection.query(query, function(err, results) {
+                resolve(results);
+            });
         })
-    })
 
-    promiseCheckBlocked
-        .then((results) => {
-            req.resultsSv.server.error = false;
-            if (results[0].count !== 0) {
-                //console.log('block');
+        // add value to api
+        covertApiAccounts(sql, api);
 
-                req.resultsSv.account.blocked = true;
-                res.json(req.resultsSv)
-            } else {
-                //console.log('NOT BLOCKED');
-
-                req.resultsSv.account.blocked = false;
-                res.json(req.resultsSv)
-            }
-            //disConnection();
-        })
-        .catch((err) => {
-            console.log(err.message);
-
-            req.resultsSv.server.error = true;
-            req.resultsSv.server.message = "error check blocked account";
-            res.status(500).json(req.resultsSv)
-            //disConnection();
-        })
+        res.json(api)
+    } catch(error) {
+        api.error = {
+            message: error.message,
+        }
+        res.status(500).json(api)
+    }
 }
 
 module.exports = {
-    checkRequest,
-    checkExist,
-    checkBlocked
+    responseApi
 }
