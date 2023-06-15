@@ -79,7 +79,7 @@ async function checkExist(req, res, next) {
             req.resultsSv.server.error = true;
             req.resultsSv.server.message = "error check exist account";
             console.log(err.message);
-            res.json(req.resultsSv);
+            res.status(500).json(req.resultsSv);
         })
 }
 
@@ -122,7 +122,7 @@ function checkBlocked(req, res, next) {
 
             req.resultsSv.server.error = true;
             req.resultsSv.server.message = "error check blocked account";
-            res.json(req.resultsSv)
+            res.status(500).json(req.resultsSv)
             //disConnection();
         })
 }

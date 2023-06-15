@@ -115,7 +115,7 @@ function add(req, res, next) {
         })
         .catch((error) => {
             console.log(error.message);
-            res.json({
+            res.status(500).json({
                 error: true,
                 message: 'error add acccount',
                 success: false,
