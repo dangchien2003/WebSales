@@ -2,7 +2,7 @@ const {
     connection
 } = require('../../../config/config_mysql')
 
-const resultsSv = {
+const initialResultsSv = {
     request: {
         fullInfo: "",
     },
@@ -15,19 +15,27 @@ const resultsSv = {
         exist: "",
         firstName: "",
         lastName: "",
+        id: "",
+        rank: "",
     },
 
 }
 
-function disconnectSql() {
-    connection.end();
-}
+// function openConnection() {
+//     console.log('openConnection');
+//     connection.connect(() => {});
+// }
+
+// function disConnection() {
+//     console.log('disConnection');
+//     connection.end();
+// }
 
 function checkRequest(req, res, next) {
     //console.log('checkRequest');
-
-    req.resultsSv = resultsSv;
-
+    req.resultsSv = {
+        ...req.resultsSv, ...initialResultsSv
+    };
     if (req.body.user && req.body.password) {
         req.resultsSv.request.fullInfo = true;
         next();
@@ -39,9 +47,8 @@ function checkRequest(req, res, next) {
 
 async function checkExist(req, res, next) {
     //console.log('checkExist');
-
-    const query = `select count(*) as count from websales.accounts where User = '${req.body.user}' and Password = '${req.body.password}'`;
-
+    req.resultsSv = { ...req.resultsSv, ...initialResultsSv };
+    const query = `select count(*) as count, rank, user AS id from websales.accounts where User = '${req.body.user}' and Password = '${req.body.password}'`;
 
     const promiseCheckExist = new Promise((resolve, reject) => {
         connection.query(query, (err, results) => {
@@ -60,6 +67,8 @@ async function checkExist(req, res, next) {
             const count = results[0].count;
             if (count !== 0) {
                 req.resultsSv.account.exist = true;
+                req.resultsSv.account.id = results[0].id;
+                req.resultsSv.account.rank = results[0].rank;
                 next();
             } else {
                 req.resultsSv.account.exist = false;
@@ -77,7 +86,7 @@ async function checkExist(req, res, next) {
 
 function checkBlocked(req, res, next) {
     //console.log('checkBlocked');
-
+    req.resultsSv = { ...req.resultsSv, ...initialResultsSv };
     const user = req.body.user;
     const query = `SELECT COUNT(*) AS count FROM websales.accounts WHERE User = '${user}' AND BLOCKED = 1`;
 
@@ -95,7 +104,7 @@ function checkBlocked(req, res, next) {
     promiseCheckBlocked
         .then((results) => {
             req.resultsSv.server.error = false;
-            if (results[0].count != 0) {
+            if (results[0].count !== 0) {
                 //console.log('block');
 
                 req.resultsSv.account.blocked = true;
@@ -106,6 +115,7 @@ function checkBlocked(req, res, next) {
                 req.resultsSv.account.blocked = false;
                 res.json(req.resultsSv)
             }
+            //disConnection();
         })
         .catch((err) => {
             console.log(err.message);
@@ -113,7 +123,7 @@ function checkBlocked(req, res, next) {
             req.resultsSv.server.error = true;
             req.resultsSv.server.message = "error check blocked account";
             res.json(req.resultsSv)
-            disconnectSql();
+            //disConnection();
         })
 }
 

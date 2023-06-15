@@ -1,3 +1,4 @@
+const e = require('express');
 const {
     connection
 } = require('../../../config/config_mysql')
@@ -11,7 +12,7 @@ function checkExsit(req, res, next) {
         if (result[0].count != 0) res.json({
             result: {
                 exit: true,
-                condition: true
+                condition: ''
             }
         })
         else next();
@@ -19,23 +20,34 @@ function checkExsit(req, res, next) {
 }
 
 function checkValidate(req, res, next) {
-    let data = {
-        user: req.body.user,
-        password: req.body.password,
-        rank: req.body.rank
-    }
-    let regexs = {
-        user: /^[a-zA-Z0-9]{10,}$/,
-        password: /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-        rank: /^[1-9]{1,}$/
+    let regexs = [
+        user = {
+            data: req.body.user,
+            regex: /^[a-zA-Z0-9]{10,}$/,
+        },
+        password = {
+            data: req.body.password,
+            regex: /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+        },
+        rank = {
+            data: req.body.rank,
+            regex: /^[1-9]{1,}$/,
+        },
+    ];
+    var result = {
+        exit: false,
+        condition: true
     };
-    if (regexs.user.test(data.user) && regexs.password.test(data.password) && regexs.rank.test(data.rank)) next();
-    else res.json({
-        result: {
-            exit: false,
-            condition: false
+    for(let i = 0; i < regexs.length; i++) {
+        if(!regexs[i].regex.test(regexs[i].data)){
+            result.condition = false;
+            res.json(result);
+            break;
         }
-    });
+        if(i === regexs.length-1) {
+            next();
+        }
+    }
 }
 
 function add(req, res, next) {
@@ -53,23 +65,38 @@ function add(req, res, next) {
         timeZone: 'Asia/Ho_Chi_Minh'
     };
 
-    let timeNow = `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDay()} ${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`;
+    var timeNow = `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDay()} ${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`;
 
     let query = `insert into Accounts(user, password, rank, createdAt) values ('${data.user}', '${data.password}', ${data.rank}, '${timeNow}')`;
-    connection.query(query, (error, result) => {
-        if (error) {
+
+    const promissAddAccount = new Promise((resolve, reject) => {
+        connection.query(query, (error, result) => {
+            if(error) {
+                reject(error);
+            }else {
+                resolve(result);
+            }
+        });
+    });
+
+    promissAddAccount
+        .then((result) => {
+            res.json({
+                error: false,
+                message: '',
+                success: true,
+                createAt: timeNow,
+            })
+        })
+        .catch((error) => {
             console.log(error.message);
             res.json({
                 error: true,
-                success: false
+                message: 'error add acccount',
+                success: false,
+                createAt: '',
             })
-        } else {
-            res.json({
-                error: false,
-                success: true
-            })
-        }
-    })
+        });
 }
 
 
