@@ -19,10 +19,15 @@ const resultsSv = {
 
 }
 
+function disconnectSql() {
+    connection.end();
+}
+
 function checkRequest(req, res, next) {
     //console.log('checkRequest');
 
     req.resultsSv = resultsSv;
+
     if (req.body.user && req.body.password) {
         req.resultsSv.request.fullInfo = true;
         next();
@@ -32,28 +37,41 @@ function checkRequest(req, res, next) {
     }
 }
 
-function checkExist(req, res, next) {
+async function checkExist(req, res, next) {
     //console.log('checkExist');
 
     const query = `select count(*) as count from websales.accounts where User = '${req.body.user}' and Password = '${req.body.password}'`;
 
-    connection.query(query, (error, results) => {
-        if (error) {
-            req.resultsSv.server.error = true;
-            req.resultsSv.server.message = "error check exist account";
-            console.log(error.message);
-        } else {
+
+    const promiseCheckExist = new Promise((resolve, reject) => {
+        connection.query(query, (err, results) => {
+
+            if (err) {
+                reject(err);
+            } else {
+                resolve(results);
+            }
+        });
+    });
+
+    promiseCheckExist
+        .then((results) => {
             req.resultsSv.server.error = false;
-            var count = results[0].count;
-            if (count != 0) {
+            const count = results[0].count;
+            if (count !== 0) {
                 req.resultsSv.account.exist = true;
                 next();
             } else {
                 req.resultsSv.account.exist = false;
-                res.json(req.resultsSv)
+                res.json(req.resultsSv);
             }
-        }
-    })
+        })
+        .catch((err) => {
+            req.resultsSv.server.error = true;
+            req.resultsSv.server.message = "error check exist account";
+            console.log(err.message);
+            res.json(req.resultsSv);
+        })
 }
 
 
@@ -64,14 +82,18 @@ function checkBlocked(req, res, next) {
     const query = `SELECT COUNT(*) AS count FROM websales.accounts WHERE User = '${user}' AND BLOCKED = 1`;
 
 
+    const promiseCheckBlocked = new Promise((resolve, reject) => {
+        connection.query(query, (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(result);
+            }
+        })
+    })
 
-    connection.query(query, (error, results) => {
-        if (error) {
-            console.log(error.message);
-
-            req.resultsSv.server.error = true;
-            req.resultsSv.server.message = "error check blocked account";
-        } else {
+    promiseCheckBlocked
+        .then((results) => {
             req.resultsSv.server.error = false;
             if (results[0].count != 0) {
                 console.log('block');
@@ -84,8 +106,15 @@ function checkBlocked(req, res, next) {
                 req.resultsSv.account.blocked = false;
                 res.json(req.resultsSv)
             }
-        }
-    })
+        })
+        .catch((err) => {
+            console.log(err.message);
+
+            req.resultsSv.server.error = true;
+            req.resultsSv.server.message = "error check blocked account";
+            res.json(req.resultsSv)
+            disconnectSql();
+        })
 }
 
 module.exports = {
