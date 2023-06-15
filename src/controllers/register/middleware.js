@@ -7,16 +7,37 @@ function checkExsit(req, res, next) {
     var user = req.body.user;
     let query = `select count(*) as count from accounts where user = '${user}'`;
 
-    connection.query(query, (error, result) => {
-        if (error) res.status(500).json(error);
-        if (result[0].count != 0) res.json({
-            result: {
-                exit: true,
-                condition: ''
+    const promissCheckExsit = new Promise((resolve, reject) =>{
+        connection.query(query, (error, result) => {
+            if(error) {
+                reject(error);
+            }else {
+                resolve(result);
             }
         })
-        else next();
     })
+
+    var result = {
+        error: '',
+        message: '',
+        exit: '',
+        condition: ''
+    }
+
+    promissCheckExsit
+        .then((results) => {
+            if (results[0].count != 0){
+                result.exit = true;
+                res.json(result)
+            }else {
+                next();
+            }
+        })
+        .catch((error) => {
+            result.message = 'error check exist';
+            result.exit = true;
+            res.status(500).json(result);
+        })
 }
 
 function checkValidate(req, res, next) {
@@ -34,13 +55,17 @@ function checkValidate(req, res, next) {
             regex: /^[1-9]{1,}$/,
         },
     ];
+
     var result = {
         exit: false,
-        condition: true
+        condition: true,
+        condition_name: '',
     };
+
     for(let i = 0; i < regexs.length; i++) {
         if(!regexs[i].regex.test(regexs[i].data)){
             result.condition = false;
+            result.condition_name = regexs[i].data;
             res.json(result);
             break;
         }
