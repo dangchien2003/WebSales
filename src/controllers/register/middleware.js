@@ -61,12 +61,15 @@ async function responseApi(req, res, next) {
           SELECT user FROM websales.accounts WHERE user = '${user}'
         )`
 
+        // promiss => results query
         const insert = await new Promise((resolve) => {
             connection.query(query, (err, results) => {
                 resolve(results)
             })
         })
+        
 
+        // insert ok? id|time insert : exsit|timeRequest
         if (insert.affectedRows != 0) {
             api.success = {
                 id: user,
