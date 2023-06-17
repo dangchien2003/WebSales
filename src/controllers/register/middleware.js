@@ -3,131 +3,91 @@ const {
     connection
 } = require('../../../config/config_mysql')
 
-function checkExsit(req, res, next) {
-    var user = req.body.user;
-    let query = `select count(*) as count from accounts where user = '${user}'`;
 
-    const promissCheckExsit = new Promise((resolve, reject) => {
-        connection.query(query, (error, result) => {
-            if (error) {
-                reject(error);
-            } else {
-                resolve(result);
-            }
-        })
-    })
-
-    var result = {
-        error: '',
-        message: '',
-        exit: '',
-        condition: ''
-    }
-
-    promissCheckExsit
-        .then((results) => {
-            if (results[0].count != 0) {
-                result.exit = true;
-                res.json(result)
-            } else {
-                next();
-            }
-        })
-        .catch((error) => {
-            result.message = 'error check exist';
-            result.exit = true;
-            res.status(500).json(result);
-        })
-}
 
 function checkValidate(req, res, next) {
-    let regexs = [
-        user = {
-            data: req.body.user,
-            regex: /^[a-zA-Z0-9]{10,}$/,
-        },
-        password = {
-            data: req.body.password,
-            regex: /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-        },
-        rank = {
-            data: req.body.rank,
-            regex: /^[1-9]{1,}$/,
-        },
-    ];
+    const api = {}
 
-    var result = {
-        exit: false,
-        condition: true,
-        condition_name: '',
-    };
+    try {
+        let regexs = [
+            user = {
+                data: req.body.user,
+                regex: /^[a-zA-Z0-9]{10,}$/,
+            },
+            password = {
+                data: req.body.password,
+                regex: /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+            },
+            rank = {
+                data: req.body.rank,
+                regex: /^[1-9]{1,}$/,
+            },
+        ];
 
-    for (let i = 0; i < regexs.length; i++) {
-        if (!regexs[i].regex.test(regexs[i].data)) {
-            result.condition = false;
-            result.condition_name = regexs[i].data;
-            res.json(result);
-            break;
+        for (let i = 0; i < regexs.length; i++) {
+            if (!regexs[i].regex.test(regexs[i].data)) {
+                api.condition = false;
+                api.condition_name = regexs[i].data;
+                res.json(api);
+                break;
+            }
+            if (i === regexs.length - 1) {
+                next();
+            }
         }
-        if (i === regexs.length - 1) {
-            next();
-        }
+    } catch (err) {
+        console.log(err);
+        api.server = 'error checkValidate';
+        res.status(500).json(api);
     }
 }
 
-function add(req, res, next) {
-    let data = {
-        user: req.body.user,
-        password: req.body.password,
-        rank: req.body.rank
-    }
 
-    // Lấy đối tượng Date hiện tại
-    let currentTime = new Date();
+async function responseApi(req, res, next) {
+    const api= {};
 
-    // Định dạng thời gian theo múi giờ của Việt Nam
-    let options = {
-        timeZone: 'Asia/Ho_Chi_Minh'
-    };
+    try {
+        const user = req.body.user;
+        const password = req.body.password;
+        const rank = req.body.rank;
 
-    var timeNow = `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDay()} ${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`;
+        const currentTime = new Date();
+        const timeNow = `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDay()} ${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`;
 
-    let query = `insert into Accounts(user, password, rank, createdAt) values ('${data.user}', '${data.password}', ${data.rank}, '${timeNow}')`;
+        var query = `INSERT INTO websales.accounts (user, password, rank, createdAt)
+        SELECT '${user}', '${password}', ${rank}, '${timeNow}'
+        FROM dual
+        WHERE NOT EXISTS (
+          SELECT user FROM websales.accounts WHERE user = '${user}'
+        )`
 
-    const promissAddAccount = new Promise((resolve, reject) => {
-        connection.query(query, (error, result) => {
-            if (error) {
-                reject(error);
-            } else {
-                resolve(result);
-            }
-        });
-    });
-
-    promissAddAccount
-        .then((result) => {
-            res.json({
-                error: false,
-                message: '',
-                success: true,
-                createAt: timeNow,
+        const insert = await new Promise((resolve) => {
+            connection.query(query, (err, results) => {
+                resolve(results)
             })
         })
-        .catch((error) => {
-            console.log(error.message);
-            res.status(500).json({
-                error: true,
-                message: 'error add acccount',
-                success: false,
-                createAt: '',
-            })
-        });
+
+        if (insert.affectedRows != 0) {
+            api.success = {
+                id: user,
+                createdAt: timeNow
+            }
+        } else {
+            api.success = {
+                exist: true,
+                timeRequest: timeNow
+            }
+        }
+
+        res.json(api)
+    } catch (error) {
+        console.log(error);
+        api.server = 'error insert account';
+        res.status(500).json(api);
+    }
 }
 
-
-
 module.exports = {
-    checkExsit,
     checkValidate,
-    add
+    responseApi
 }

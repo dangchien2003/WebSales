@@ -24,8 +24,7 @@ function covertApiAccounts(sql, api) {
     }
 }
 async function responseApi(req, res, next) {
-    console.log("🚀 ~ file: middleware.js:27 ~ responseApi ~ req:", req.body)
-    
+
     const api = {};
     try {
         // check full info
@@ -37,7 +36,6 @@ async function responseApi(req, res, next) {
 
         const query = `select count(user) as count, rank, blocked, user from websales.accounts where user = '${req.body.user}' and Password = '${req.body.password}'`;
 
-        console.log("🚀 ~ file: middleware.js:40 ~ responseApi ~ query:", query)
         // promise => result query
         const sql = await new Promise((resolve) => {
             connection.query(query, function(err, results) {
@@ -49,7 +47,7 @@ async function responseApi(req, res, next) {
         covertApiAccounts(sql, api);
 
         res.json(api)
-    } catch(error) {
+    } catch (error) {
         api.error = {
             message: error.message,
         }
