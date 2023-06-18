@@ -4,7 +4,6 @@ const {apiProducts, urlHaventPage} = require('./middleware');
 
 
 
-router.get('/page/:page',apiProducts);
-router.get('/page',urlHaventPage);
+router.get('/',apiProducts);
 
 module.exports = router;

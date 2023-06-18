@@ -2,17 +2,16 @@ const {
     connection
 } = require('../../../config/config_mysql')
 
-// request dont exist numper page
-function urlHaventPage(req, res) {
-    console.log(req.url);
-    res.redirect('/trangchu/page/1')
-}
+
 
 // res product list
 async function apiProducts(req, res) {
     const api = {}; 
     try {
-        page = req.params.page;
+        var page = req.query.page;
+        if(!page || !isNumber(page)) {
+            page = 1;
+        }
         const productInPage = 2;
 
         const query = `SELECT websales.products.Id, Shop, Name, Price, Category, Purchases, Evaluate, Image FROM websales.products 
@@ -27,10 +26,17 @@ async function apiProducts(req, res) {
             })
         });
 
-        res.json({
+
+        // Tạo header Set-Cookie
+        res.setHeader('Set-Cookie', `test1= 1; Path=/trangchu/page; Max-Age = 30`);
+        // Phản hồi từ server
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        // api json
+        res.end(JSON.stringify({
             page,
             products
-        })
+        }));
+
 
     }catch(e){
         console.log(e.message);
@@ -42,6 +48,5 @@ async function apiProducts(req, res) {
 }
 
 module.exports = {
-    apiProducts,
-    urlHaventPage
+    apiProducts
 }
