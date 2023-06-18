@@ -1,14 +1,18 @@
 const { query } = require('express');
 const {
     connection
-} = require('../../../config/config_mysql')
+} = require('../../../config/config_mysql');
 
-const until = require('../../until/until')
+const until = require('../../until/until');
+
+
+
 
 function getId(id) {
     return id.slice(2);
 }
 
+// trả về thông tin 1 sản phẩm khi có id và name
 async function apiProduct(req, res) {
 
     try {
@@ -49,5 +53,4 @@ async function apiProduct(req, res) {
     
 }
 
-
-module.exports = apiProduct;
+module.exports = {apiProduct,};
