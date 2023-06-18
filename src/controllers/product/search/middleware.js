@@ -1,4 +1,6 @@
-const { query } = require('express');
+const {
+    query
+} = require('express');
 const {
     connection
 } = require('../../../../config/config_mysql');
@@ -9,7 +11,7 @@ const until = require('../../../until/until');
 async function apiProducts(req, res) {
     try {
         const key = req.params.key;
-        const page = until.isNumber(req.query.page)?req.query.page : 1;
+        const page = until.isNumber(req.query.page) ? req.query.page : 1;
         const productInPage = 2;
 
         const query = `SELECT websales.products.Id, Shop, Name, Price, Category, Purchases, Evaluate, Image 
@@ -25,23 +27,23 @@ async function apiProducts(req, res) {
             })
         })
 
-        if(products.Length > 0) {
+        if (products.Length > 0) {
             res.json(products);
-        }else {
+        } else {
             res.json({
                 products: 0,
             });
         }
-        
-    }catch(err) {
+
+    } catch (err) {
         console.log(err);
         res.json({
             error: 1,
             message: err.message
         })
     }
-    
-    
+
+
 }
 
 module.exports = {

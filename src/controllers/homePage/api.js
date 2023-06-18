@@ -1,9 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const {apiProducts, urlHaventPage} = require('./middleware');
+const {
+    apiProducts,
+    urlHaventPage
+} = require('./middleware');
 
 
 
-router.get('/',apiProducts);
+router.get('/', apiProducts);
 
 module.exports = router;

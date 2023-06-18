@@ -44,7 +44,7 @@ function checkValidate(req, res, next) {
 
 
 async function responseApi(req, res, next) {
-    const api= {};
+    const api = {};
 
     try {
         const user = req.body.user;
@@ -67,7 +67,7 @@ async function responseApi(req, res, next) {
                 resolve(results)
             })
         })
-        
+
 
         // insert ok? id|time insert : exsit|timeRequest
         if (insert.affectedRows != 0) {

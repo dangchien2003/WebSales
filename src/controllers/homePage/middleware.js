@@ -7,10 +7,10 @@ const until = require('../../until/until')
 
 // res product list
 async function apiProducts(req, res) {
-    const api = {}; 
+    const api = {};
     try {
         var page = req.query.page;
-        if(!page || !until.isNumber(page)) {
+        if (!page || !until.isNumber(page)) {
             page = 1;
         }
         const productInPage = 2;
@@ -20,7 +20,7 @@ async function apiProducts(req, res) {
         WHERE websales.products.DeletedAt IS NULL 
         ORDER BY websales.products.Id 
         LIMIT ${(page-1)* productInPage}, ${productInPage}`;
-        
+
         const products = await new Promise((resolve) => {
             connection.query(query, (e, results) => {
                 resolve(results);
@@ -31,7 +31,9 @@ async function apiProducts(req, res) {
         // Tạo header Set-Cookie
         res.setHeader('Set-Cookie', `test1= 1; Path=/trangchu/page; Max-Age = 30`);
         // Phản hồi từ server
-        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.writeHead(200, {
+            'Content-Type': 'application/json'
+        });
         // api json
         res.end(JSON.stringify({
             page,
@@ -39,7 +41,7 @@ async function apiProducts(req, res) {
         }));
 
 
-    }catch(e){
+    } catch (e) {
         console.log(e.message);
         api.server = {
             message: e.message,
