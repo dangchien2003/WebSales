@@ -12,3 +12,10 @@ function isNumber(variable) {
   
     return false;
 }
+
+const until = {
+    isNumber,
+}
+
+
+module.exports = until;

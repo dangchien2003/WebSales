@@ -2,6 +2,7 @@ const {
     connection
 } = require('../../../config/config_mysql')
 
+const until = require('../../until/until')
 
 
 // res product list
@@ -9,7 +10,7 @@ async function apiProducts(req, res) {
     const api = {}; 
     try {
         var page = req.query.page;
-        if(!page || !isNumber(page)) {
+        if(!page || !until.isNumber(page)) {
             page = 1;
         }
         const productInPage = 2;
