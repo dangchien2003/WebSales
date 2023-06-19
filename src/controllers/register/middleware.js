@@ -54,11 +54,11 @@ async function responseApi(req, res, next) {
         const currentTime = new Date();
         const timeNow = `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDay()} ${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`;
 
-        var query = `INSERT INTO websales.accounts (user, password, rank, createdAt)
+        var query = `INSERT INTO websales.accounts (websales.accounts.user, websales.accounts.password, websales.accounts.rank, websales.accounts.createdAt)
         SELECT '${user}', '${password}', ${rank}, '${timeNow}'
         FROM dual
         WHERE NOT EXISTS (
-          SELECT user FROM websales.accounts WHERE user = '${user}'
+          SELECT user FROM websales.accounts WHERE websales.accounts.user = '${user}'
         )`
 
         // promiss => results query

@@ -26,8 +26,8 @@ async function apiProducts(req, res) {
                 resolve(results);
             })
         })
-
-        if (products.Length > 0) {
+        
+        if (products.length > 0) {
             res.json(products);
         } else {
             res.json({
