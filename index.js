@@ -1,4 +1,5 @@
 const express = require('express')
+const jwt = require('jsonwebtoken')
 
 const app = express()
 
@@ -18,6 +19,10 @@ app.use('/trangchu', require('./src/controllers/homePage/api'));
 
 //url 127.0.0.1:3000/product
 app.use('/product', require('./src/controllers/product/api'));
+
+app.use((req, res) => {
+    res.json('đường dẫn không tồn tại');
+})
 
 const port = 3000
 app.listen(port, () => console.log('127.0.0.1:', port))

@@ -12,7 +12,7 @@ async function apiCart(req, res) {
 
     try {
         //const idCustomer = req.cookies.user;
-        var idCustomer = 1;
+        const idCustomer = req.body.user;
         var idProduct = req.body.idProduct;
         const quantity = req.body.quantity;
         const idAttribute = req.body.idAttribute;
@@ -67,6 +67,9 @@ async function apiCart(req, res) {
     }
     
 }
+
+
+
 
 module.exports = {
     apiCart

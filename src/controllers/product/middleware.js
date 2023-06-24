@@ -33,17 +33,28 @@ async function apiProduct(req, res) {
                 })
             })
 
+            
+
             if (productInfos[0]) {
-                res.json(productInfos[0])
+                // Tạo header Set-Cookie
+                res.setHeader('Set-Cookie', `sp=${productId}; Path=/;`);
+                // Phản hồi từ server
+                res.writeHead(200, {
+                    'Content-Type': 'application/json'
+                });
+                res.end(JSON.stringify(
+                    productInfos[0]
+                ));
                 return;
             }
         }
 
+        // productInfos[0]) == undefine
         res.json({
-            id: req.query.id,
-            name: req.params.name,
-            exist: false,
-        })
+                id: req.query.id,
+                name: req.params.name,
+                exist: false,
+        });
 
     } catch (err) {
         console.log(err);
