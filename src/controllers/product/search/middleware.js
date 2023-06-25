@@ -1,6 +1,4 @@
-const {
-    query
-} = require('express');
+
 const {
     connection
 } = require('../../../../config/config_mysql');

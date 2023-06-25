@@ -1,9 +1,9 @@
-const {
-    query
-} = require('express');
+
 const {
     connection
 } = require('../../../config/config_mysql');
+
+const helper = require('../../until/helper');
 
 const until = require('../../until/until');
 
@@ -22,16 +22,18 @@ async function apiProduct(req, res) {
         const name = req.params.name;
 
         if (until.isNumber(productId)) {
-            const query = `SELECT products.Id, Name, Date, Origin, Description, DeletedAt as Exist
+            const query = `SELECT products.Id, Name, Date, Origin, Description
             FROM websales.productInfos 
             LEFT JOIN websales.products ON websales.products.Id = websales.productInfos.Id
             WHERE websales.products.Id = '${productId}' and Name = '${name}' and DeletedAt IS NULL`;
 
-            const productInfos = await new Promise((resolve) => {
-                connection.query(query, (e, result) => {
-                    resolve(result);
-                })
-            })
+            const productInfos = await helper.query(query);
+
+            // const productInfos = await new Promise((resolve) => {
+            //     connection.query(query, (e, result) => {
+            //         resolve(result);
+            //     })
+            // })
 
             
 
