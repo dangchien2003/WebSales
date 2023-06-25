@@ -1,6 +1,4 @@
-const {
-    connection
-} = require('../../../../config/config_mysql');
+const helper = require('../../../until/helper');
 
 const until = require('../../../until/until');
 
@@ -43,11 +41,7 @@ async function apiCart(req, res) {
             WHERE websales.customers.Id = '${idCustomer}'
         )`;
 
-        const addCart = await new Promise((resolve) =>{
-            connection.query(query, (e, result) =>{
-                resolve(result);
-            });
-        });
+        const addCart = await helper.query(query);
 
         if(addCart.affectedRows != 0) {
             res.json({

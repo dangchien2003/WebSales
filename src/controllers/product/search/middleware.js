@@ -1,7 +1,5 @@
 
-const {
-    connection
-} = require('../../../../config/config_mysql');
+const helper = require('../../../until/helper')
 
 const until = require('../../../until/until');
 
@@ -19,11 +17,7 @@ async function apiProducts(req, res) {
         ORDER BY websales.products.Id
         LIMIT ${(page-1)* productInPage}, ${productInPage} `;
 
-        const products = await new Promise((resolve) => {
-            connection.query(query, (e, results) => {
-                resolve(results);
-            })
-        })
+        const products = await helper.query(query);
         
         if (products.length > 0) {
             res.json(products);

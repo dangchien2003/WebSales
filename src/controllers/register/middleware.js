@@ -1,7 +1,4 @@
-const e = require('express');
-const {
-    connection
-} = require('../../../config/config_mysql')
+const helper = require('../../until/helper');
 
 
 
@@ -62,11 +59,7 @@ async function responseApi(req, res, next) {
         )`
 
         // promiss => results query
-        const insert = await new Promise((resolve) => {
-            connection.query(query, (err, results) => {
-                resolve(results)
-            })
-        })
+        const insert = await helper.query(query);
 
 
         // insert ok? id|time insert : exsit|timeRequest

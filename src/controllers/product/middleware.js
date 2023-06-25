@@ -29,14 +29,6 @@ async function apiProduct(req, res) {
 
             const productInfos = await helper.query(query);
 
-            // const productInfos = await new Promise((resolve) => {
-            //     connection.query(query, (e, result) => {
-            //         resolve(result);
-            //     })
-            // })
-
-            
-
             if (productInfos[0]) {
                 // Tạo header Set-Cookie
                 res.setHeader('Set-Cookie', `sp=${productId}; Path=/;`);

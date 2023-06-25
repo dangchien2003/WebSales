@@ -1,6 +1,4 @@
-const {
-    connection
-} = require('../../../config/config_mysql')
+const helper = require('../../until/helper');
 
 function checkRequest(req) {
     if (req.body.user && req.body.password) {
@@ -37,11 +35,7 @@ async function responseApi(req, res, next) {
         const query = `select count(user) as count, rank, blocked, user from websales.accounts where user = '${req.body.user}' and Password = '${req.body.password}'`;
 
         // promise => result query
-        const sql = await new Promise((resolve) => {
-            connection.query(query, function(err, results) {
-                resolve(results);
-            });
-        })
+        const sql = await helper.query(query);
 
         // add value to api
         covertApiAccounts(sql, api);
