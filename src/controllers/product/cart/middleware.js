@@ -11,15 +11,16 @@ function getIdProduct(id) {
     return id.slice(2);
 }
 
+
 function getParagraphDeleteProducts(listProduct) {
     para = '';
     for (let i = 0; i < listProduct.length; i++) {
-        para += ` websales.carts.IdProduct = '${listProduct[i]}' `;
+        para += ` '${listProduct[i]}' `;
         if (i < listProduct.length - 1) {
-            para += "OR";
+            para += ", ";
         }
     }
-    return ` AND (${para})`;
+    return ` AND websales.carts.IdProduct IN(${para})`;
 }
 
 async function apiAddCart(req, res) {
@@ -81,25 +82,38 @@ async function apiAddCart(req, res) {
 
 async function apiDeleteCart(req, res) {
     try {
+        //cart = req.cookies.cart
         listProduct = req.body.boughtProduct;
-
-        // user = req.cookies.user;
-        user = 1;
-        // quantity = req.cookies.cart.quantity;
+        user = 1; // giải mã jwt
         quantity = 3;
+        //quantity = cart.quantity;
         var endQuery = "";
+        console.log(typeof listProduct);
+        if(typeof listProduct == "string") {
+            listProduct = [listProduct]; 
+        }
         if (listProduct.length < quantity) {
             endQuery = getParagraphDeleteProducts(listProduct);
         }
         const query = `DELETE FROM websales.carts 
-        WHERE websales.carts.IdCustomer = '1' 
-        ${endQuery}`;
-        console.log("🚀 ~ file: middleware.js:90 ~ apiDeleteCart ~ query:", query)
+        WHERE websales.carts.IdCustomer = ${user} 
+        ${endQuery} 
+        AND 
+        (SELECT COUNT(websales.carts.IdProduct) 
+        FROM websales.carts
+        WHERE websales.carts.IdCustomer = ${user} 
+        ${endQuery}) = ${listProduct.length}`;
 
+        console.log("🚀 ~ file: middleware.js:90 ~ apiDeleteCart ~ query:", query)
+        // lấy dữ liệu database
         data = await helper.query(query);
 
         if (data.affectedRows == 0) {
-            res.status(400).json("không tìm thấy sản phẩm")
+            res.status(400).json({
+                error: true,
+                error_message: 'sản phẩm không tồn tại',
+                listProduct,
+            })
         } else {
             res.status(200).json({
                 affected: data.affectedRows,
