@@ -1,4 +1,3 @@
-
 const {
     connection
 } = require('../../../config/config_mysql');
@@ -45,9 +44,9 @@ async function apiProduct(req, res) {
 
         // productInfos[0]) == undefine
         res.json({
-                id: req.query.id,
-                name: req.params.name,
-                exist: false,
+            id: req.query.id,
+            name: req.params.name,
+            exist: false,
         });
 
     } catch (err) {

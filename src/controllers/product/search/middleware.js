@@ -1,4 +1,3 @@
-
 const helper = require('../../../until/helper')
 
 const until = require('../../../until/until');
@@ -18,7 +17,7 @@ async function apiProducts(req, res) {
         LIMIT ${(page-1)* productInPage}, ${productInPage} `;
 
         const products = await helper.query(query);
-        
+
         if (products.length > 0) {
             res.json(products);
         } else {

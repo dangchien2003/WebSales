@@ -8,11 +8,17 @@ const {
     apiProducts
 } = require('./search/middleware')
 
-const {apiCart} = require('./cart/middleware')
+const {
+    apiAddCart,
+    apiDeleteCart
+} = require('./cart/middleware')
 
 
 // post 127.0.0.1:3000/product/addcart
-router.post('/addcart', apiCart)
+router.post('/addcart', apiAddCart)
+
+// post 127.0.0.1:3000/product/delete
+router.post('/delete', apiDeleteCart)
 
 // get 127.0.0.1:3000/product/search
 router.get('/search/:key', apiProducts);
