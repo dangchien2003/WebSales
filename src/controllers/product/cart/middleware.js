@@ -89,8 +89,8 @@ async function apiDeleteCart(req, res) {
         //quantity = cart.quantity;
         var endQuery = "";
         console.log(typeof listProduct);
-        if(typeof listProduct == "string") {
-            listProduct = [listProduct]; 
+        if (typeof listProduct == "string") {
+            listProduct = [listProduct];
         }
         if (listProduct.length < quantity) {
             endQuery = getParagraphDeleteProducts(listProduct);
