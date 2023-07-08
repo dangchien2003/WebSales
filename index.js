@@ -32,7 +32,7 @@ app.use('/trangchu', require('./src/controllers/homePage/api'));
 app.use('/product', require('./src/controllers/product/api'));
 
 //test
-app.use('/', require('./test'));
+app.use('/test', require('./test'));
 
 
 app.use((req, res) => {

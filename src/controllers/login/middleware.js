@@ -59,12 +59,12 @@ async function responseApi(req, res, next) {
             data_access = {
                 user: api.account.id,
                 blocked: !!sql[0].blocked,
-                createAt: Date.now(),
+                createdAt: Date.now(),
                 tokenDie: Date.now()+timeAccessToken*1000,
             }
             data_refresh = {
                 user: api.account.id,
-                createAt: Date.now(),
+                createdAt: Date.now(),
                 rank: sql[0].rank,
             }
             accessToken = token.createToken(data_access, 'access_token', {path: '/', maxAge: 10*60});

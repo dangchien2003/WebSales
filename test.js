@@ -11,7 +11,12 @@ const {
 
 
 router.get('/', (req, res) => {
+    
+    a = {
+        abc: 3333,
+    }
 
+    res.json(a['abc'])
 })
 
 module.exports = router;

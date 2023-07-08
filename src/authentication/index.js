@@ -19,6 +19,27 @@ function createToken(data, category) {
    return encryption.signToken(data, lifeTime);
 }
 
+function checkToken(access_token, refresh_token) {
+    dataToken = [access_token, refresh_token];
+    for(let i = 0; i < dataToken.length; i++) {
+        dataToken[i] = encryption.verifyToken(dataToken[i]);
+    }
+
+    if((dataToken[0].data && dataToken[1]).data) {
+        if(dataToken[0].user == dataToken[1].user && dataToken[0].createdAt > Date.now()) {
+            return dataToken;
+        }
+    }else {
+        return false;
+    }
+}
+
+function checkPermission(User_) {
+
+}
+
 module.exports = {
     createToken,
+    checkToken,
+    checkPermission,
 }
